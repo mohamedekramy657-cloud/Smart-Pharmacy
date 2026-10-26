@@ -1,0 +1,51 @@
+# Pilot / local stack. NOT TESTED in the build sandbox (Docker unavailable there) — see docs/09-operations.md.
+# Usage (from repo root):  cp .env.example .env  (edit secrets)  &&  docker compose -f infra/docker-compose.yml up -d --build
+name: smart-pharmacy
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: pharma
+      POSTGRES_USER: pharma
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes: [dbdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pharma -d pharma"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  migrate:
+    build: { context: .., dockerfile: apps/api/Dockerfile }
+    image: smart-pharmacy-api:local
+    command: ["node", "apps/api/dist/src/database/migrate.cli.js"]
+    env_file: ../.env
+    environment: { DATABASE_URL: "postgres://pharma:${POSTGRES_PASSWORD}@db:5432/pharma" }
+    depends_on: { db: { condition: service_healthy } }
+    restart: "no"
+  api:
+    image: smart-pharmacy-api:local
+    env_file: ../.env
+    environment:
+      DATABASE_URL: "postgres://pharma:${POSTGRES_PASSWORD}@db:5432/pharma"
+      API_HOST: 0.0.0.0
+      WORKER_ENABLED: "false"
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    restart: unless-stopped
+  worker:
+    image: smart-pharmacy-api:local
+    command: ["node", "apps/api/dist/src/worker.js"]
+    env_file: ../.env
+    environment: { DATABASE_URL: "postgres://pharma:${POSTGRES_PASSWORD}@db:5432/pharma" }
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    restart: unless-stopped
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+      args: { API_INTERNAL_URL: "http://api:4000" }
+    ports: ["3000:3000"]
+    depends_on: [api]
+    restart: unless-stopped
+volumes:
+  dbdata:

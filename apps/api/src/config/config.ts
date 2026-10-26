@@ -22,6 +22,8 @@ const EnvSchema = z.object({
   SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(24 * 60).default(30),
   SESSION_ABSOLUTE_HOURS: z.coerce.number().int().min(1).max(24 * 30).default(12),
   COOKIE_SECURE: bool.default(false),
+  COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).default('lax'),
+  COOKIE_PARTITIONED: bool.default(false),
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
   ADMIN_MFA_REQUIRED: bool.default(false),
   WORKER_ENABLED: bool.default(true),
@@ -57,6 +59,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       problems.push('DATA_ENCRYPTION_KEY must be set');
     }
     if (!cfg.COOKIE_SECURE) problems.push('COOKIE_SECURE must be true');
+    if (cfg.COOKIE_SAMESITE === 'none' && !cfg.COOKIE_SECURE) problems.push('COOKIE_SAMESITE=none requires COOKIE_SECURE=true');
     if (cfg.EMAIL_PROVIDER === 'dev-log' || cfg.SMS_PROVIDER === 'dev-log') {
       problems.push('dev-log notification providers are not allowed in production');
     }

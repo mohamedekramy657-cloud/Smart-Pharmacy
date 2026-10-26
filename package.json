@@ -3,13 +3,28 @@
   "private": true,
   "version": "0.1.0",
   "description": "Smart Pharmacy Ecosystem - pharmacy inventory, warehouse distribution and patient medicine finder (modular monolith)",
-  "workspaces": ["apps/api", "apps/web"],
-  "engines": { "node": ">=20.9" },
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "api:build": "npm run build -w apps/api",
     "api:test": "npm test -w apps/api",
     "web:build": "npm run build -w apps/web",
     "db:migrate": "npm run db:migrate -w apps/api",
-    "db:seed": "npm run db:seed -w apps/api"
+    "db:seed": "npm run db:seed -w apps/api",
+    "dev:setup": "bash scripts/dev-setup.sh",
+    "perf:finder": "node scripts/perf/finder-latency.mjs"
+  },
+  "overrides": {
+    "@nestjs/platform-express": {
+      "multer": "2.5.0"
+    },
+    "@nestjs/swagger": {
+      "js-yaml": "5.5.0"
+    }
   }
 }

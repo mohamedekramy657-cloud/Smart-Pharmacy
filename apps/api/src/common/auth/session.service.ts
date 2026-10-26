@@ -37,13 +37,15 @@ export class SessionService {
 
   setCookies(res: Response, token: string, csrf: string): void {
     const cfg = config();
-    const base = { secure: cfg.COOKIE_SECURE, sameSite: 'lax' as const, path: '/', maxAge: cfg.SESSION_ABSOLUTE_HOURS * 3600 * 1000 };
+    // SameSite defaults to Lax. 'none' (+ Partitioned/CHIPS) is only for embedded deployments (e.g. preview
+    // iframes); CSRF protection then relies on the header token + JSON-only API, which remain enforced.
+    const base = { secure: cfg.COOKIE_SECURE, sameSite: cfg.COOKIE_SAMESITE, partitioned: cfg.COOKIE_PARTITIONED, path: '/', maxAge: cfg.SESSION_ABSOLUTE_HOURS * 3600 * 1000 };
     res.cookie(this.sessionCookie, token, { ...base, httpOnly: true });
     res.cookie(this.csrfCookie, csrf, { ...base, httpOnly: false });
   }
 
   clearCookies(res: Response): void {
-    const opts = { secure: config().COOKIE_SECURE, sameSite: 'lax' as const, path: '/' };
+    const opts = { secure: config().COOKIE_SECURE, sameSite: config().COOKIE_SAMESITE, partitioned: config().COOKIE_PARTITIONED, path: '/' };
     res.clearCookie(this.sessionCookie, opts);
     res.clearCookie(this.csrfCookie, opts);
   }

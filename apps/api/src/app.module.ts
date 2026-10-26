@@ -102,7 +102,10 @@ export class HealthModule {}
         genReqId: (_req, res) => String(res.getHeader('X-Request-Id') ?? ''),
         redact: { paths: ['req.headers.cookie', 'req.headers.authorization', 'req.headers["x-csrf-token"]', 'req.headers["x-sp-signature"]', 'res.headers["set-cookie"]'], remove: true },
         autoLogging: { ignore: (req) => (req.url ?? '').startsWith('/api/health') },
-        serializers: { req: (req: { method: string; url: string; id: string }) => ({ method: req.method, url: req.url?.split('?')[0], id: req.id }) },
+        serializers: {
+          req: (req: { method: string; url: string; id: string }) => ({ method: req.method, url: req.url?.split('?')[0], id: req.id }),
+          res: (res: { statusCode: number }) => ({ statusCode: res.statusCode }),
+        },
       },
     }),
     ThrottlerModule.forRoot({ throttlers: [{ name: 'default', ttl: 60_000, limit: () => config().RATE_LIMIT_PER_MINUTE }] }),

@@ -1,0 +1,15 @@
+{
+  "name": "smart-pharmacy-ecosystem",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Smart Pharmacy Ecosystem - pharmacy inventory, warehouse distribution and patient medicine finder (modular monolith)",
+  "workspaces": ["apps/api", "apps/web"],
+  "engines": { "node": ">=20.9" },
+  "scripts": {
+    "api:build": "npm run build -w apps/api",
+    "api:test": "npm test -w apps/api",
+    "web:build": "npm run build -w apps/web",
+    "db:migrate": "npm run db:migrate -w apps/api",
+    "db:seed": "npm run db:seed -w apps/api"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "outcomes": {
+    "NO_MATCHING_STOCK": 22,
+    "FOUND": 380
+  },
+  "bands": {
+    "5": 310,
+    "40": 52,
+    "none": 22,
+    "20": 18
+  },
+  "freshness": {
+    "confirmed": 150,
+    "recent": 28,
+    "integration": 4,
+    "stale": 14
+  },
+  "unmet": {
+    "Mixtard 30 100 IU/mL": 22
+  },
+  "pharmacies": {
+    "n": 24
+  }
+}

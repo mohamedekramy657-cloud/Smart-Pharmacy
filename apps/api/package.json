@@ -12,7 +12,8 @@
     "openapi": "node dist/src/openapi.cli.js",
     "test": "jest --runInBand",
     "test:unit": "jest --runInBand test/unit",
-    "test:integration": "jest --runInBand test/integration"
+    "test:integration": "jest --runInBand test/integration",
+    "db:showcase": "node dist/src/database/showcase.cli.js"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",
